@@ -217,19 +217,113 @@ input,select,textarea{font-family:inherit;font-size:15px;color:var(--ink)}
   </div>
 </div>
 
-<!-- ============ APP ============ -->
-<div id="appView" class="hide">
-  <aside class="side">
-    <div class="brand"><img id="sideLogo" alt=""><div><b>NEEV ACADEMY</b><span id="sideRole">Admin Panel</span></div></div>
-    <nav class="nav" id="sideNav"></nav>
-    <div class="foot"><button onclick="logout()">Log out</button></div>
-  </aside>
-  <main class="main" id="mainArea"></main>
-  <nav class="bnav"><div class="in" id="bottomNav"></div></nav>
-</div>
+<!-- ============ ADD STUDENT MODAL ============ -->
+<div class="mback">
+  <div class="modal">
+    <div class="mhead">
+      <h3 class="serif">Add student</h3>
+      <button class="mx" aria-label="Close modal">×</button>
+    </div>
 
-<div id="modalHost"></div>
-<div class="toast" id="toast"></div>
+    <div class="grid">
+      <!-- Row 1: ID and Full Name -->
+      <div class="frow">
+        <div class="fld">
+          <label>Student ID</label>
+          <input type="text" value="NA-001" readonly style="background: #fdfaf2; font-weight: 600;">
+        </div>
+        <div class="fld">
+          <label>Full Name</label>
+          <input type="text" placeholder="e.g. Student's Name">
+        </div>
+      </div>
+
+      <!-- Row 2: Grade and Board -->
+      <div class="frow">
+        <div class="fld">
+          <label>Grade</label>
+          <select>
+            <option selected>Jr.Kg</option>
+            <option>Sr.Kg</option>
+            <option>Nursery</option>
+          </select>
+        </div>
+        <div class="fld">
+          <label>Board</label>
+          <select>
+            <option selected>SSC (State)</option>
+            <option>CBSE</option>
+            <option>ICSE</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Row 3: Medium and Monthly Fee -->
+      <div class="frow">
+        <div class="fld">
+          <label>Medium</label>
+          <select>
+            <option selected>English</option>
+            <option>Hindi</option>
+            <option>Marathi</option>
+          </select>
+        </div>
+        <div class="fld">
+          <label>Monthly Fee (₹)</label>
+          <input type="number" placeholder="Monthly Fees">
+        </div>
+      </div>
+
+      <!-- Row 4: Parent Info and Mobile -->
+      <div class="frow">
+        <div class="fld">
+          <label>Parent / Guardian</label>
+          <input type="text" placeholder="Parent name">
+        </div>
+        <div class="fld">
+          <label>WhatsApp Mobile</label>
+          <input type="tel" placeholder="10-digit number">
+        </div>
+      </div>
+
+      <!-- Row 5: Fees Start and Status -->
+      <div class="frow">
+        <div class="fld">
+          <label>Fees Start From</label>
+          <select>
+            <option selected>June</option>
+            <option>April</option>
+            <option>January</option>
+          </select>
+        </div>
+        <div class="fld">
+          <label>Status</label>
+          <select>
+            <option selected>Active</option>
+            <option>Inactive</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Row 6: Password Options (Span Full Width) -->
+      <div class="fld" style="margin-top: 6px;">
+        <label style="color: var(--amber); font-weight: 800;">Portal Password · Not Set</label>
+        <div class="frow">
+          <input type="text" placeholder="Student login password">
+          <button class="btn o" style="justify-content: center; height: 46px; border-radius: 10px;">Generate password</button>
+        </div>
+        <p style="font-size: 12px; color: var(--mut); margin-top: 6px; font-weight: 500;">
+          Student will need this password (with ID & mobile) to open their portal. Leave blank to allow login without a password.
+        </p>
+      </div>
+
+      <!-- Save Button Row -->
+      <button class="btn p" style="width: 100%; justify-content: center; padding: 14px; font-size: 15px; margin-top: 10px;">
+        Save student
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- hidden receipt render stage for PDF -->
 <div id="pdfStage" style="position:fixed;left:-9999px;top:0"></div>
