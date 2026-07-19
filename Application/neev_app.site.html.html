@@ -367,11 +367,7 @@ async function sdelBig(k){
     for(let i=0;i<n;i++) await sdel(k+':'+i);
     await sdel(k);
   }catch(e){}
-}async function sdelBig(k){
-  if(!USE_DATABASE){try{localStorage.removeItem(k)}catch(e){}return}
-  try{const m=await fdb().collection('kv').doc(k).get();const n=m.exists?(m.data().chunks||0):0;
-  for(let i=0;i<n;i++)await sdel(k+':'+i);await sdel(k)}catch(e){}}
-
+}
 /* ---------- ACADEMIC SESSIONS ----------
    Every session (26-27, 27-28, …) keeps its OWN students, attendance,
    homework, fees, tests, notes and notices. Old sessions are never
