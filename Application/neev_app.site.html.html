@@ -314,33 +314,60 @@ function fdb(){if(!FDB){firebase.initializeApp(FIREBASE_CONFIG);FDB=firebase.fir
 function lsGet(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){toast('⚠️ Phone storage is full — could not save');console.error(e)}}
 
+const KV_ENDPOINT = '/.netlify/functions/kv';
+
+async function mongoGet(k){
+  const r = await fetch(KV_ENDPOINT + '?key=' + encodeURIComponent(k));
+  if (r.status === 404) throw 'missing';
+  if (!r.ok) throw 'error';
+  return (await r.json()).v;
+}
+async function mongoSet(k, v){
+  const r = await fetch(KV_ENDPOINT + '?key=' + encodeURIComponent(k), {
+    method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({v})
+  });
+  if (!r.ok) throw 'error';
+}
+async function mongoDel(k){
+  await fetch(KV_ENDPOINT + '?key=' + encodeURIComponent(k), { method: 'DELETE' });
+}
+
 async function sget(k,d){
   if(!USE_DATABASE)return lsGet(k,d);
-  try{const doc=await fdb().collection('kv').doc(k).get();return doc.exists?JSON.parse(doc.data().v):d}catch(e){console.error(e);return d}
+  try{ return JSON.parse(await mongoGet(k)); }
+  catch(e){ if(e!=='missing') console.error(e); return d; }
 }
-/* sset never blocks the screen: local mode saves instantly; database mode
-   saves in the BACKGROUND so the app stays fast even on slow internet */
 async function sset(k,v){
   if(!USE_DATABASE){lsSet(k,v);return}
-  const payload=JSON.stringify(v);
-  fdb().collection('kv').doc(k).set({v:payload}).catch(e=>{toast('⚠️ Could not sync — check internet');console.error(e)});
+  try{ await mongoSet(k, JSON.stringify(v)); }
+  catch(e){ toast('⚠️ Could not sync — check internet'); console.error(e); }
 }
 async function sdel(k){
   if(!USE_DATABASE){try{localStorage.removeItem(k)}catch(e){}return}
-  fdb().collection('kv').doc(k).delete().catch(()=>{});
+  await mongoDel(k).catch(()=>{});
 }
-/* big values (note PDFs) — local: single key; database: chunked docs (1MB limit) */
 async function ssetBig(k,str){
   if(!USE_DATABASE){try{localStorage.setItem(k,str)}catch(e){throw 'quota'}return}
   const CH=700000;const n=Math.ceil(str.length/CH);
-  for(let i=0;i<n;i++)await fdb().collection('kv').doc(k+':'+i).set({v:str.slice(i*CH,(i+1)*CH)});
-  await fdb().collection('kv').doc(k).set({v:'',chunks:n});}
+  for(let i=0;i<n;i++) await mongoSet(k+':'+i, str.slice(i*CH,(i+1)*CH));
+  await mongoSet(k, JSON.stringify({chunks:n}));
+}
 async function sgetBig(k){
   if(!USE_DATABASE){const v=localStorage.getItem(k);if(v===null)throw 'missing';return v}
-  const m=await fdb().collection('kv').doc(k).get();if(!m.exists)throw 'missing';
-  const n=m.data().chunks||0;let out='';
-  for(let i=0;i<n;i++){const c=await fdb().collection('kv').doc(k+':'+i).get();out+=c.data().v}return out;}
+  const meta = JSON.parse(await mongoGet(k));
+  const n = meta.chunks || 0; let out='';
+  for(let i=0;i<n;i++) out += await mongoGet(k+':'+i);
+  return out;
+}
 async function sdelBig(k){
+  if(!USE_DATABASE){try{localStorage.removeItem(k)}catch(e){}return}
+  try{
+    const meta = JSON.parse(await mongoGet(k));
+    const n = meta.chunks || 0;
+    for(let i=0;i<n;i++) await sdel(k+':'+i);
+    await sdel(k);
+  }catch(e){}
+}async function sdelBig(k){
   if(!USE_DATABASE){try{localStorage.removeItem(k)}catch(e){}return}
   try{const m=await fdb().collection('kv').doc(k).get();const n=m.exists?(m.data().chunks||0):0;
   for(let i=0;i<n;i++)await sdel(k+':'+i);await sdel(k)}catch(e){}}
