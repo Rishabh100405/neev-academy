@@ -1,3 +1,3 @@
 [build]
-  publish = "."
-  functions = "netlify/functions"
+  publish = "neev-academy/application"
+  functions = "neev-academy/application/netlify/functions"
