@@ -1,8 +1,15 @@
 const express = require('express');
+const cors = require('cors'); // 1. Require the cors package
 const { MongoClient } = require('mongodb');
 const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 10000;
+
+// 2. Enable CORS for your Vercel frontend domain
+app.use(cors({
+    origin: ['https://neev-academy-bpjgnyybm-rishabh57mishra-gmailcoms-projects.vercel.app', 'https://neev-academy.vercel.app'], 
+    credentials: true
+}));
 
 app.use(express.json());
 
