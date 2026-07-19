@@ -2,11 +2,13 @@
   "name": "neev-academy",
   "version": "1.0.0",
   "description": "Neev Academy Portal",
-  "main": "index.html",
+  "main": "server.js",
   "scripts": {
+    "start": "node server.js",
     "build": "echo 'No build script required'"
   },
   "dependencies": {
+    "express": "^4.19.2",
     "mongodb": "^6.0.0"
   }
 }
